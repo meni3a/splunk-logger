@@ -48,7 +48,7 @@ export class SplunkLogger{
                     }
                     else{
                         if(self.isLogsPrinted)
-                        console.log(`${new Date().toISOString().substr(11, 8)} | ${type} | ${message}`)
+                        console.log(`${new Date().toISOString().substr(11, 8)} - ${type} - ${message}`)
                     }
                 }
                 else if(result?.code != 0){
