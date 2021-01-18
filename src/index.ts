@@ -1,6 +1,5 @@
 const request = require('request')
 
-
 export class SplunkLogger{
 
     constructor(url:String,token:String) {

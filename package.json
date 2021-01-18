@@ -14,7 +14,15 @@
     "type": "git",
     "url": "git+https://github.com/meni3a/splunk-logger.git"
   },
-  "keywords": [],
+  "keywords": [
+    "splunk",
+    "HTTP",
+    "event",
+    "collector",
+    "logging",
+    "logger",
+    "HEC"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
