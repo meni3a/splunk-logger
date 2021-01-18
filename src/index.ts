@@ -43,7 +43,7 @@ export class SplunkLogger{
                 const result = JSON.parse(response?.body)
                 if(result?.code == 0){
                     if(self.isFirstLog){
-                        console.log("Logger is initial successfully")
+                        console.log("Logger initialed successfully")
                         self.isFirstLog = false
                     }
                     else{

@@ -1,7 +1,7 @@
 {
   "name": "splunk-logger",
   "version": "1.0.7",
-  "description": "��#\u0000 \u0000S\u0000i\u0000m\u0000p\u0000l\u0000e\u0000 \u0000S\u0000p\u0000l\u0000u\u0000n\u0000k\u0000 \u0000L\u0000o\u0000g\u0000g\u0000e\u0000r\u0000\r\u0000 \u0000",
+  "description": "A simple splunk loggers",
   "main": "index.js",
   "scripts": {
     "version": "npm run format && git add -A src",
