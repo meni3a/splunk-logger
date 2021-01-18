@@ -1,4 +1,4 @@
-import request = require('request');
+const request = require('request')
 
 
 export class SplunkLogger{
@@ -9,8 +9,6 @@ export class SplunkLogger{
         
         this.initial()
     }
-
-    private writeLog:boolean = true
 
     private options = {
         'method': 'POST',
