@@ -35,7 +35,7 @@ export class SplunkLogger{
         this.options.body = JSON.stringify(payload)
         
         const self = this
-        request(this.options, function (error, response) {
+        request(this.options, function (error:any, response:any) {
             if (error){
                 console.log("SplunkLogger Error: ",error)
             }
