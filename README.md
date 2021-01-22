@@ -34,7 +34,7 @@ var SplunkLogger = require('splunk-logger').SplunkLogger
 import SplunkLogger from 'splunk-logger'
 
 const URL = "http://127.0.0.1:8088/services/collector/event"
-const  TOKEN = "87dfd-df76d-df6f-87fg-dfg87f8g7g"
+const TOKEN = "87dfd-df76d-df6f-87fg-dfg87f8g7g"
 
 let log = new SplunkLogger(URL,TOKEN)
 
@@ -43,18 +43,18 @@ log.info("server started")
 ```
 You can expect the console to print:
 ```
-Logger initialed successfully
+Logger initialized successfully
 ```
 In case of error, please check if your Splunk settings and make sure your token and address are correct.
 
 ## Console write
-As a default Splunk-logger print your logs to the console as well a following:
+By default, Splunk-logger will print your logs to the console as well:
 
 ```
-12:31:12 - info - server started
-12:31:17 - error - your error message
+12:31:12 - INFO - server started
+12:31:17 - ERROR    - your error message
 ```
-If you want to disable this options you can simply set it to false:
+You can disable the above option by setting isLogsPrinted to false:
 
 ```js
 log.isLogsPrinted = false

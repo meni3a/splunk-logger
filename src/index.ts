@@ -1,5 +1,7 @@
 const request = require('request')
 
+
+
 export class SplunkLogger{
 
     constructor(url:String,token:String) {
@@ -7,6 +9,15 @@ export class SplunkLogger{
         this.options.url = url.toString()
         
         this.initial()
+    }
+
+    private colors = {
+        regular: "\u001b[1;0m",
+        red: "\u001b[1;31m",
+        green: "\u001b[1;32m",
+        yellow: "\u001b[1;33m",
+        cyan: "\u001b[1;36m"
+        
     }
 
     private options = {
@@ -17,12 +28,12 @@ export class SplunkLogger{
         },
         body: ''
       
-      };
+      }
 
       private isFirstLog:boolean = true
       public isLogsPrinted:boolean = true
 
-      private send(type:string, message:string){
+      private send(type:string, message:any){
         let payload = {
             event: {
                 message: message,
@@ -32,7 +43,7 @@ export class SplunkLogger{
         this.options.body = JSON.stringify(payload)
         
         const self = this
-        request(this.options, function (error:any, response:any) {
+        request(this.options, function (error:Error, response:any) {
             if (error){
                 console.log("SplunkLogger Error: ",error)
             }
@@ -44,8 +55,35 @@ export class SplunkLogger{
                         self.isFirstLog = false
                     }
                     else{
-                        if(self.isLogsPrinted)
-                        console.log(`${new Date().toISOString().substr(11, 8)} - ${type} - ${message}`)
+
+                        if(self.isLogsPrinted){
+                            let color = self.colors.regular
+                            switch(type){
+                                case "ERROR":
+                                    color = self.colors.red
+                                    break
+                                case "INFO":
+                                    color = self.colors.green
+                                    break
+                                case "WARN":
+                                    color = self.colors.yellow
+                                    break
+                                case "FATAL":
+                                    color = self.colors.red
+                                    break
+                                case "DEBUG":
+                                    color = self.colors.cyan
+                                    break 
+                                default:
+                                    break;                                
+                                
+                            }
+
+                            const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${type} ${self.colors.regular} - ${JSON.stringify(message)}`
+                            console.log(log)
+                       
+                        }
+
                     }
                 }
                 else if(result?.code != 0){
@@ -60,18 +98,17 @@ export class SplunkLogger{
 
       
     }
-    private initial(){this.send("initial","Logger initialed")}
+    private initial(){this.send("INITIAL","Logger initialed")}
 
-    public error(message:string){ this.send("error",message)}
+    public error(message:any){ this.send("ERROR",message)}
 
-    public info(message:string){ this.send("info",message)}
+    public info(message:any){ this.send("INFO",message)}
 
-    public warn(message:string) { this.send("warn",message)}
+    public warn(message:any) { this.send("WARN",message)}
     
-    public fatal(message:string) { this.send("fatal",message)}
+    public fatal(message:any) { this.send("FATAL",message)}
 
-    public debug(message:string) { this.send("debug",message)}
+    public debug(message:any) { this.send("DEBUG",message)}
 
 
 }
-
