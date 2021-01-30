@@ -1,6 +1,6 @@
 {
   "name": "splunk-logger",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A simple splunk loggers",
   "main": "index.js",
   "scripts": {
