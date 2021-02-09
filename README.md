@@ -17,21 +17,14 @@ Use the package manager [npm](https://www.npmjs.com/package/splunk-logger) to in
 ```bash
 npm install splunk-logger
 ```
-ES6:
-```js
-import SplunkLogger from 'splunk-logger'
-```
-CommonJS:
 
- ```js
-var SplunkLogger = require('splunk-logger').SplunkLogger
-```
 
 ## Usage
 
   
 ```js
-import SplunkLogger from 'splunk-logger'
+
+const { SplunkLogger } = require('splunk-logger')
 
 const URL = "http://127.0.0.1:8088/services/collector/event"
 const TOKEN = "87dfd-df76d-df6f-87fg-dfg87f8g7g"
