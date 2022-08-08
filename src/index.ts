@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 
-class httpRequest {
+class HttpRequest {
     constructor(url:string,method:string,headers:object,body:any){
         this.url = url
         this.method = method
@@ -14,7 +14,7 @@ class httpRequest {
     body: any
 
 }
-class splunkMessage{
+class SplunkMessage{
     constructor(type?: string,message?:any){
         this.type = type 
         this.message = message
@@ -22,12 +22,12 @@ class splunkMessage{
     type: string | undefined;
     message:any
 }
-class splunkPayload{
+class SplunkPayload{
     constructor(type?: string,message?:any){
-        this.event = new splunkMessage(type, message)
+        this.event = new SplunkMessage(type, message)
     }
     
-    event:splunkMessage
+    event:SplunkMessage
 }
 
 export class SplunkLogger{
@@ -43,7 +43,7 @@ export class SplunkLogger{
     }
 
     private processing: boolean;
-    private queue: httpRequest[];
+    private queue: HttpRequest[];
     private fn: Function;
 
     private url: String;
@@ -60,81 +60,94 @@ export class SplunkLogger{
 
 
     public isLogsPrinted:boolean = true
+    public isQueueMode:boolean = false
 
-    async run() {
-        
+    async run() :Promise<void> {
+
         while (!this.processing && this.queue.length) {
-            try {
-                this.processing = true;
-                let request = this.queue.shift()  
 
-                const payload = <splunkPayload>(request?.body);
-                if(request!=null){   
-                    request.body =JSON.stringify(payload)
-
-                }
-
-                const response = await this.fn(request?.url,request)       
-                const result = await response.json();
-
-                if(result?.code == 0){
-
-                    if(this.isLogsPrinted){
-                        let color = this.colors.regular
-                        switch(payload.event.type){
-                            case "ERROR":
-                                color = this.colors.red
-                                break 
-                            case "INFO":
-                                color = this.colors.green
-                                break
-                            case "WARN":
-                                color = this.colors.yellow
-                                break
-                            case "FATAL":
-                                color = this.colors.red
-                                break
-                            case "DEBUG":
-                                color = this.colors.cyan
-                                break 
-                            case "INITIAL":
-                                color = this.colors.cyan
-                                break 
-                            default:
-                                break;                                
-                            
-                        }
-
-                        const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${this.colors.regular} - ${JSON.stringify(payload.event.message)}`
-                        console.log(log)
-                
-                    }
-
-                }
-                else{
-                    console.log("SplunkLogger Error: " + result?.text)
-                }
+            this.processing = true;
+            const request = this.queue.shift();
+            
+            if(request){
+                await this.processRequest(request);
             }
-            catch(err) {
-                console.log("SplunkLogger Fail: ",err)
-            } 
-            finally{
-                this.processing = false;
-            }
+
+            this.processing = false;
         }
 
     }
      
 
+    private async processRequest(request: HttpRequest) {
+        try {
+
+            const payload = <SplunkPayload>(request?.body);
+            if (request != null) {
+                request.body = JSON.stringify(payload);
+
+            }
+
+            const response = await this.fn(request?.url, request);
+            const result = await response.json();
+
+            if (result?.code == 0) {
+
+                if (this.isLogsPrinted) {
+                    let color = this.colors.regular;
+                    switch (payload.event.type) {
+                        case "ERROR":
+                            color = this.colors.red;
+                            break;
+                        case "INFO":
+                            color = this.colors.green;
+                            break;
+                        case "WARN":
+                            color = this.colors.yellow;
+                            break;
+                        case "FATAL":
+                            color = this.colors.red;
+                            break;
+                        case "DEBUG":
+                            color = this.colors.cyan;
+                            break;
+                        case "INITIAL":
+                            color = this.colors.cyan;
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                    const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${this.colors.regular} - ${JSON.stringify(payload.event.message)}`;
+                    console.log(log);
+
+                }
+
+            }
+            else {
+                console.log("SplunkLogger Error: " + result?.text);
+            }
+        }
+        catch (err) {
+            console.log("SplunkLogger Fail: ", err);
+        }
+    }
+
     private send(type:string, message:any){
 
         const headers = {Authorization:`Splunk ${this.token}`}
-        const body = new splunkPayload(type,message)
-        const request = new httpRequest(this.url.toString(),"POST",headers, body)
+        const body = new SplunkPayload(type,message);
+        const request = new HttpRequest(this.url.toString(),"POST",headers, body);
 
-        this.queue.push(request)
+        if(this.isQueueMode){
+            this.queue.push(request);
+            this.run();
+        }
+        else{
+            this.processRequest(request);
+        }
 
-        this.run()
     }
 
 
