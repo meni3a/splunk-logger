@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 
 class HttpRequest {
-    constructor(url:string,method:string,headers:object,body:any){
+    constructor(url: string, method: string, headers: object, body: any) {
         this.url = url
         this.method = method
         this.headers = headers
@@ -14,25 +14,51 @@ class HttpRequest {
     body: any
 
 }
-class SplunkMessage{
-    constructor(type?: string,message?:any){
-        this.type = type 
+class SplunkMessage {
+    constructor(type: LogType, message: any) {
+        this.type = type
         this.message = message
     }
-    type: string | undefined;
-    message:any
+    type: LogType;
+    message: any
 }
-class SplunkPayload{
-    constructor(type?: string,message?:any){
+class SplunkPayload {
+    constructor(type: LogType, message: any) {
         this.event = new SplunkMessage(type, message)
     }
-    
-    event:SplunkMessage
+
+    event: SplunkMessage
 }
 
-export class SplunkLogger{
+enum Colors {
+    Regular = "\u001b[1;0m",
+    Red = "\u001b[1;31m",
+    Green = "\u001b[1;32m",
+    Yellow = "\u001b[1;33m",
+    Cyan = "\u001b[1;36m"
+}
 
-    constructor(url:String,token:String) {
+enum LogType {
+    ERROR = "ERROR",
+    INFO = "INFO",
+    WARN = "WARN",
+    FATAL = "FATAL",
+    DEBUG = "DEBUG",
+    INITIAL = "INITIAL"
+}
+
+const LogTypeToColor = {
+    [LogType.ERROR]: Colors.Red,
+    [LogType.INFO]: Colors.Green,
+    [LogType.WARN]: Colors.Yellow,
+    [LogType.FATAL]: Colors.Red,
+    [LogType.DEBUG]: Colors.Cyan,
+    [LogType.INITIAL]: Colors.Regular
+}
+
+export class SplunkLogger {
+
+    constructor(url: String, token: String) {
         this.queue = [];
         this.processing = false;
         this.fn = fetch;
@@ -49,17 +75,7 @@ export class SplunkLogger{
     private url: String;
     private token: String;
 
-    private colors = {
-        regular: "\u001b[1;0m",
-        red: "\u001b[1;31m",
-        green: "\u001b[1;32m",
-        yellow: "\u001b[1;33m",
-        cyan: "\u001b[1;36m"
-        
-    }
-
-
-    public isLogsPrinted:boolean = true
+    public isLogsPrinted: boolean = true
     public isQueueMode:boolean = false
 
     async run() :Promise<void> {
@@ -77,7 +93,6 @@ export class SplunkLogger{
         }
 
     }
-     
 
     private async processRequest(request: HttpRequest) {
         try {
@@ -94,34 +109,9 @@ export class SplunkLogger{
             if (result?.code == 0) {
 
                 if (this.isLogsPrinted) {
-                    let color = this.colors.regular;
-                    switch (payload.event.type) {
-                        case "ERROR":
-                            color = this.colors.red;
-                            break;
-                        case "INFO":
-                            color = this.colors.green;
-                            break;
-                        case "WARN":
-                            color = this.colors.yellow;
-                            break;
-                        case "FATAL":
-                            color = this.colors.red;
-                            break;
-                        case "DEBUG":
-                            color = this.colors.cyan;
-                            break;
-                        case "INITIAL":
-                            color = this.colors.cyan;
-                            break;
-                        default:
-                            break;
-
-                    }
-
-                    const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${this.colors.regular} - ${JSON.stringify(payload.event.message)}`;
-                    console.log(log);
-
+                    let color = LogTypeToColor[payload.event.type]
+                    const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${Colors.Regular} - ${JSON.stringify(payload.event.message)}`
+                    console.log(log)
                 }
 
             }
@@ -134,7 +124,7 @@ export class SplunkLogger{
         }
     }
 
-    private send(type:string, message:any){
+    private send(type:LogType, message:any){
 
         const headers = {Authorization:`Splunk ${this.token}`}
         const body = new SplunkPayload(type,message);
@@ -151,17 +141,17 @@ export class SplunkLogger{
     }
 
 
-    private initial(){this.send("INITIAL","Logger initialed")}
+    private initial() { this.send(LogType.INITIAL, "Logger initialed") }
 
-    public error(message:any){ this.send("ERROR",message)}
+    public error(message: any) { this.send(LogType.ERROR, message) }
 
-    public info(message:any){ this.send("INFO",message)}
+    public info(message: any) { this.send(LogType.INFO, message) }
 
-    public warn(message:any) { this.send("WARN",message)}
-    
-    public fatal(message:any) { this.send("FATAL",message)}
+    public warn(message: any) { this.send(LogType.WARN, message) }
 
-    public debug(message:any) { this.send("DEBUG",message)}
+    public fatal(message: any) { this.send(LogType.FATAL, message) }
+
+    public debug(message: any) { this.send(LogType.DEBUG, message) }
 
 
 }
