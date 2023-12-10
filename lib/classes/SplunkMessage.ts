@@ -1,10 +1,10 @@
-import { LogType } from "./enums/LogType";
+import { LogLevel } from "../enums/LogType";
 
 export class SplunkMessage {
-    constructor(type: LogType, message: any) {
+    constructor(type: LogLevel, message: any) {
         this.type = type;
         this.message = message;
     }
-    type: LogType;
+    type: LogLevel;
     message: any;
 }

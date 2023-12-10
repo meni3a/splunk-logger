@@ -1,8 +1,8 @@
 import { SplunkMessage } from "./SplunkMessage";
-import { LogType } from "./enums/LogType";
+import { LogLevel } from "../enums/LogType";
 
 export class SplunkPayload {
-    constructor(type: LogType, message: any) {
+    constructor(type: LogLevel, message: any) {
         this.event = new SplunkMessage(type, message);
     }
 
