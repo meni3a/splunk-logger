@@ -3,12 +3,13 @@ import { HttpRequest } from "../utils/HttpRequest";
 import { LogLevel } from "../enums/LogType";
 import { LogTypeToColor } from "../utils/LogTypeToColor";
 import { SplunkPayload } from "./SplunkPayload";
-import { SplunkLoggerOptions } from "../types/SplunkLoggerOptions";
+import { SplunkLoggerOptions } from "./SplunkLoggerOptions";
 
 
 export class SplunkLogger {
 
-    constructor(options: SplunkLoggerOptions) {
+    constructor(optionsObj: SplunkLoggerOptions) {
+        const options = new SplunkLoggerOptions(optionsObj);
         this.queue = [];
         this.processing = false;
 
@@ -21,11 +22,9 @@ export class SplunkLogger {
             this.fn = fetch;
         }
 
-        options.ssl = options.ssl ?? true;
-        this.url = `${options.ssl?'https':'http'}://${options.domain}/services/collector`;
+        this.url = `${options.ssl?'https':'http'}://${options.domain}:${options.port}/services/collector`;
         this.token = options.token;
-        this.shouldPrintLogs = options.shouldPrintLogs ?? true;
-        this.isQueueMode = options.isQueueMode ?? false;
+
         this.initial();
     }
 

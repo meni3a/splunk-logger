@@ -1,6 +1,6 @@
 import Transport from "winston-transport";
 import { SplunkLogger } from "./SplunkLogger";
-import { SplunkLoggerOptions } from "../types/SplunkLoggerOptions";
+import { SplunkLoggerOptions } from "./SplunkLoggerOptions";
 
 
 const PROCESS_ID = process.pid;

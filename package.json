@@ -1,8 +1,9 @@
 {
   "name": "splunk-logger",
-  "version": "1.0.19",
+  "version": "2.0.0",
   "description": "A simple splunk loggers",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "version": "git add -A lib",
     "postversion": "git push && git push --tags",

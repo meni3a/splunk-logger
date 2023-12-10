@@ -8,6 +8,6 @@
       "strict": true,
       "sourceMap":true
     },
-    "include": ["lib"],
+    "include": ["lib", "index.ts"],
     "exclude": ["node_modules"]
   }
