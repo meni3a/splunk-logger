@@ -1,72 +1,25 @@
-const fetch = require('node-fetch');
-
-
-class HttpRequest {
-    constructor(url: string, method: string, headers: object, body: any) {
-        this.url = url
-        this.method = method
-        this.headers = headers
-        this.body = body
-    }
-    url: string
-    method: string
-    headers: object
-    body: any
-
-}
-class SplunkMessage {
-    constructor(type: LogType, message: any) {
-        this.type = type
-        this.message = message
-    }
-    type: LogType;
-    message: any
-}
-class SplunkPayload {
-    constructor(type: LogType, message: any) {
-        this.event = new SplunkMessage(type, message)
-    }
-
-    event: SplunkMessage
-}
-
-enum Colors {
-    Regular = "\u001b[1;0m",
-    Red = "\u001b[1;31m",
-    Green = "\u001b[1;32m",
-    Yellow = "\u001b[1;33m",
-    Cyan = "\u001b[1;36m"
-}
-
-enum LogType {
-    ERROR = "ERROR",
-    INFO = "INFO",
-    WARN = "WARN",
-    FATAL = "FATAL",
-    DEBUG = "DEBUG",
-    INITIAL = "INITIAL"
-}
-
-const LogTypeToColor = {
-    [LogType.ERROR]: Colors.Red,
-    [LogType.INFO]: Colors.Green,
-    [LogType.WARN]: Colors.Yellow,
-    [LogType.FATAL]: Colors.Red,
-    [LogType.DEBUG]: Colors.Cyan,
-    [LogType.INITIAL]: Colors.Regular
-}
+import { Colors } from "./enums/Colors";
+import { HttpRequest } from "./HttpRequest";
+import { LogType } from "./enums/LogType";
+import { LogTypeToColor } from "./LogTypeToColor";
+import { SplunkPayload } from "./SplunkPayload";
+import fetch from 'node-fetch';
 
 export class SplunkLogger {
 
-    constructor(url: String, token: String) {
+    constructor(options:{domain: string, token:string, shouldPrintLogs?:boolean, isQueueMode?:boolean}) {
         this.queue = [];
         this.processing = false;
         this.fn = fetch;
 
-        this.url = url
-        this.token = token
+        this.url = `https://${options.domain}/services/collector`
+        this.token = options.token
+        this.shouldPrintLogs = options.shouldPrintLogs ?? true
+        this.isQueueMode = options.isQueueMode ?? false
         this.initial()
     }
+
+    
 
     private processing: boolean;
     private queue: HttpRequest[];
@@ -75,7 +28,7 @@ export class SplunkLogger {
     private url: String;
     private token: String;
 
-    public isLogsPrinted: boolean = true
+    public shouldPrintLogs: boolean = true
     public isQueueMode:boolean = false
 
     async run() :Promise<void> {
@@ -108,7 +61,7 @@ export class SplunkLogger {
 
             if (result?.code == 0) {
 
-                if (this.isLogsPrinted) {
+                if (this.shouldPrintLogs) {
                     let color = LogTypeToColor[payload.event.type]
                     const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${Colors.Regular} - ${JSON.stringify(payload.event.message)}`
                     console.log(log)
@@ -152,6 +105,7 @@ export class SplunkLogger {
     public fatal(message: any) { this.send(LogType.FATAL, message) }
 
     public debug(message: any) { this.send(LogType.DEBUG, message) }
-
+    
+    public http(message: any) { this.send(LogType.HTTP, message) }
 
 }
