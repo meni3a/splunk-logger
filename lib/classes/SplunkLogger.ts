@@ -2,55 +2,51 @@ import { Colors } from "../enums/Colors";
 import { HttpRequest } from "../utils/HttpRequest";
 import { LogLevel } from "../enums/LogType";
 import { LogTypeToColor } from "../utils/LogTypeToColor";
-import { SplunkPayload } from "./SplunkPayload";
+import { SplunkPayload } from "../types/SplunkPayload";
 import { SplunkLoggerOptions } from "./SplunkLoggerOptions";
 
 
 export class SplunkLogger {
 
     constructor(optionsObj: SplunkLoggerOptions) {
-        const options = new SplunkLoggerOptions(optionsObj);
+        this.options = new SplunkLoggerOptions(optionsObj);
         this.queue = [];
         this.processing = false;
 
         // check if fetch is available (only in nodejs 18+), if not, use node-fetch
         if (typeof fetch === "undefined") {
             const nodeFetch = require('node-fetch');
-            this.fn = nodeFetch;
+            this.fetchMethod = nodeFetch;
         }
         else{
-            this.fn = fetch;
+            this.fetchMethod = fetch;
         }
 
-        this.url = `${options.ssl?'https':'http'}://${options.domain}:${options.port}/services/collector`;
-        this.token = options.token;
+        this.url = `${this.options.ssl?'https':'http'}://${this.options.domain}:${this.options.port}/services/collector`;
 
         this.initial();
     }
 
 
-
+    private options!: SplunkLoggerOptions;
     private processing: boolean;
     private queue: HttpRequest[];
-    private fn: Function;
-
+    private fetchMethod: Function;
     private url: String;
-    private token: String;
 
-    public shouldPrintLogs: boolean = true;
-    public isQueueMode: boolean = false;
 
-    async run(): Promise<void> {
+
+    async executeFromQueue(): Promise<void> {
 
         while (!this.processing && this.queue.length) {
 
             this.processing = true;
-            const request = this.queue.shift();
 
-            if (request) {
-                await this.processRequest(request);
-            }
-
+            const requests = this.queue.splice(0, this.options.numOfParallelRequests);
+            const promises = requests.map(request => this.processRequest(request));
+            
+            await Promise.all(promises);
+            
             this.processing = false;
         }
 
@@ -65,12 +61,12 @@ export class SplunkLogger {
 
             }
 
-            const response = await this.fn(request?.url, request);
+            const response = await this.fetchMethod(request?.url, request);
             const result = await response.json();
 
             if (result?.code == 0) {
 
-                if (this.shouldPrintLogs) {
+                if (this.options.shouldPrintLogs) {
                     let color = LogTypeToColor[payload.event.type];
                     const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${Colors.Regular} - ${JSON.stringify(payload.event.message)}`;
                     console.log(log);
@@ -86,15 +82,15 @@ export class SplunkLogger {
         }
     }
 
-    private send(type: LogLevel, message: any) {
+    private handleLog(type: LogLevel, message: any) {
 
-        const headers = { Authorization: `Splunk ${this.token}` };
-        const body = new SplunkPayload(type, message);
+        const headers = { Authorization: `Splunk ${this.options.token}` };
+        const body = { type, message };
         const request = new HttpRequest(this.url.toString(), "POST", headers, body);
 
-        if (this.isQueueMode) {
+        if (this.options.isQueueMode) {
             this.queue.push(request);
-            this.run();
+            this.executeFromQueue();
         }
         else {
             this.processRequest(request);
@@ -103,17 +99,17 @@ export class SplunkLogger {
     }
 
 
-    private initial() { this.send(LogLevel.INITIAL, "Logger initialed"); }
+    private initial() { this.handleLog(LogLevel.INITIAL, "Logger initialed"); }
 
-    public error(message: any) { this.send(LogLevel.ERROR, message); }
+    public error(message: any) { this.handleLog(LogLevel.ERROR, message); }
 
-    public info(message: any) { this.send(LogLevel.INFO, message); }
+    public info(message: any) { this.handleLog(LogLevel.INFO, message); }
 
-    public warn(message: any) { this.send(LogLevel.WARN, message); }
+    public warn(message: any) { this.handleLog(LogLevel.WARN, message); }
 
-    public fatal(message: any) { this.send(LogLevel.FATAL, message); }
+    public fatal(message: any) { this.handleLog(LogLevel.FATAL, message); }
 
-    public debug(message: any) { this.send(LogLevel.DEBUG, message); }
+    public debug(message: any) { this.handleLog(LogLevel.DEBUG, message); }
 
 
 

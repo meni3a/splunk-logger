@@ -1,9 +1,7 @@
 
 # splunk-logger
   
-
-splunk-logger is a JavaScript library for dealing with sending logs to splunk.
-
+splunk-logger is a robust and efficient JavaScript library designed to streamline the process of sending logs to Splunk. It provides a simple yet powerful interface for log management.
   
 
 ## Installation
@@ -13,7 +11,6 @@ splunk-logger is a JavaScript library for dealing with sending logs to splunk.
 Use the package manager [npm](https://www.npmjs.com/package/splunk-logger) to install splunk-logger.
 
   
-
 ```bash
 npm install splunk-logger
 ```
@@ -23,35 +20,52 @@ npm install splunk-logger
 
   
 ```js
+import { SplunkLogger } from "splunk-logger";
 
-const { SplunkLogger } = require('splunk-logger')
+const logger = new SplunkLogger({
+    token: "your token",
+    domain: "your splunk host",
+});
 
-const URL = "http://127.0.0.1:8088/services/collector/event"
-const TOKEN = "87dfd-df76d-df6f-87fg-dfg87f8g7g"
+logger.info('server is running on port 3000');
+```
 
-const log = new SplunkLogger(URL,TOKEN)
+### Use with Winston logger
+```js
+import * as winston from "winston";
+import { SplunkLogger } from "splunk-logger";
+import { SplunkWinstonTransport } from "splunk-logger";
 
-log.info("server started")
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new SplunkWinstonTransport({
+            token: "your token",
+            domain: "your splunk host",
+        })
+    ]
+});
+```
 
+### Full options object
+```js
+const options = new SplunkLoggerOptions({
+    domain: "localhost",
+    port: 8088,
+    ssl: false,
+    token: "00000000-0000-0000-0000-000000000000",
+    shouldPrintLogs: true,
+    isQueueMode: false,
+    numOfParallelRequests: 100
+});
+
+const logger = new SplunkLogger(options)
 ```
 You can expect the console to print:
 ```
 12:31:12 - INITIAL - Logger initialed
 ```
 In case of error, please check if your Splunk settings and make sure your token and address are correct.
-
-## Console write
-By default, Splunk-logger will print your logs to the console as well:
-
-```
-12:31:12 - INFO - server started
-12:31:17 - ERROR - your error message
-```
-You can disable the above option by setting isLogsPrinted to false:
-
-```js
-log.isLogsPrinted = false
-```
 
 
 ## Log levels
@@ -63,8 +77,7 @@ log.isLogsPrinted = false
  - debug
 
   
-  
-  
+
 
 ## License
 

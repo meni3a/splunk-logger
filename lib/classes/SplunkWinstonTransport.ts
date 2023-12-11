@@ -13,8 +13,9 @@ export class SplunkWinstonTransport extends Transport {
 		super();
 
 		if (!options || !options.token || !options.domain) {
-			console.info("Invalid Configuration: config is invalid " + JSON.stringify(options));
-			throw new Error();
+			const errorMsg = "Invalid Configuration: config is invalid " + JSON.stringify(options);
+			console.error(errorMsg);
+			throw new Error(errorMsg);
 		}
 
 		this.splunk = new SplunkLogger(options);

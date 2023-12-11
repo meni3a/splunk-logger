@@ -1,7 +1,7 @@
 {
   "name": "splunk-logger",
   "version": "2.0.1",
-  "description": "A simple splunk loggers",
+  "description": "An advance splunk logger for nodejs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
