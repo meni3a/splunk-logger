@@ -22,15 +22,14 @@ export class SplunkLogger {
             this.fetchMethod = fetch;
         }
 
-        this.url = `${this.options.ssl?'https':'http'}://${this.options.domain}:${this.options.port}/services/collector`;
+        this.url = `${this.options.ssl? 'https' : 'http'}://${this.options.domain}:${this.options.port}/services/collector`;
 
-        this.initial();
     }
 
 
     private options!: SplunkLoggerOptions;
     private processing: boolean;
-    private queue: HttpRequest[];
+    private queue: SplunkPayload[];
     private fetchMethod: Function;
     private url: String;
 
@@ -43,37 +42,29 @@ export class SplunkLogger {
             this.processing = true;
 
             const requests = this.queue.splice(0, this.options.numOfParallelRequests);
-            const promises = requests.map(request => this.processRequest(request));
             
-            await Promise.all(promises);
+            await this.processRequest(requests);
             
             this.processing = false;
         }
 
     }
 
-    private async processRequest(request: HttpRequest) {
+    private async processRequest(requests: SplunkPayload[]) {
         try {
+            const headers = { Authorization: `Splunk ${this.options.token}` };
 
-            const payload = <SplunkPayload>(request?.body);
-            if (request != null) {
-                request.body = JSON.stringify(payload);
+            const request = new HttpRequest({
+                url: this.url.toString(),
+                method: 'POST',
+                headers,
+                body: JSON.stringify(requests)
+            });
 
-            }
-
-            const response = await this.fetchMethod(request?.url, request);
+            const response = await this.fetchMethod(request);
             const result = await response.json();
 
-            if (result?.code == 0) {
-
-                if (this.options.shouldPrintLogs) {
-                    let color = LogTypeToColor[payload.event.type];
-                    const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${payload.event.type} ${Colors.Regular} - ${JSON.stringify(payload.event.message)}`;
-                    console.log(log);
-                }
-
-            }
-            else {
+            if (result?.code !== 0) {
                 console.log("SplunkLogger Error: " + result?.text);
             }
         }
@@ -84,13 +75,19 @@ export class SplunkLogger {
 
     private handleLog(type: LogLevel, message: any) {
 
-        const headers = { Authorization: `Splunk ${this.options.token}` };
-        const body = { type, message, timestamp: new Date().toISOString() };
-        const request = new HttpRequest(this.url.toString(), "POST", headers, body);
+
+        const splunkPayload:SplunkPayload = {event:{ type, message }};
+
+        if (this.options.shouldPrintLogs) {
+            let color = LogTypeToColor[type];
+            const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${type} ${Colors.Regular} - ${JSON.stringify(message)}`;
+            console.log(log);
+        }
+    
 
         if (this.options.isQueueMode) {
             if(this.queue.length <= (this.options.maxQueueSize ?? 1000)){
-                this.queue.push(request);
+                this.queue.push(splunkPayload);
             }
             else{
                console.log("SplunkLogger Fail: Queue is full");
@@ -98,13 +95,11 @@ export class SplunkLogger {
             this.executeFromQueue();
         }
         else {
-            this.processRequest(request);
+            this.processRequest([splunkPayload]);
         }
 
     }
 
-
-    private initial() { this.handleLog(LogLevel.INITIAL, "Logger initialed"); }
 
     public error(message: any) { this.handleLog(LogLevel.ERROR, message); }
 

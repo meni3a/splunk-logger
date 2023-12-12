@@ -12,14 +12,16 @@ export class SplunkLoggerOptions {
                 `SplunkLogger WARNING\n` +
                 `--------------------------------------------------------------------------------\n\n` +
                 `Description:\n` +
-                `QueueMode offers benefits such as reduced network activity and alleviated event loop pressure.\n` +
-                `However, it is important to be aware of its potential drawbacks:\n\n` +
-                `1. Memory Leak Risk: There's an inherent risk of memory leakage when using QueueMode.\n` +
-                `2. Delay in Log Processing: Logs might experience delays, affecting real-time data analysis.\n\n` +
+                `QueueMode is designed to batch a specified number of logs and send them in a single HTTP request to Splunk.\n` +
+                `This approach effectively reduces the number of HTTP requests and minimizes event loop activity.\n\n` +
+                `Key Points:\n` +
+                `1. Efficient Logging: By batching logs, QueueMode reduces the frequency of HTTP requests, enhancing performance.\n` +
+                `2. Event Loop Impact: Reduced HTTP requests mean less strain on the event loop, contributing to smoother operation.\n` +
+                `3. Memory Management: You can limit the queue size in QueueMode, preventing memory leaks.\n\n` +
                 `Recommendation:\n` +
-                `QueueMode should be used judiciously. It is suitable for advanced users who understand\n` +
-                `the implications and can manage the associated risks effectively.\n\n` +
-                `Note: Proceed with QueueMode only if you are confident in handling its intricacies.\n` +
+                `Use QueueMode to optimize logging performance, especially in high-traffic environments. It's a powerful tool\n` +
+                `for efficient log management when configured correctly with an appropriate queue size limit.\n\n` +
+                `Note: Ensure proper configuration of QueueMode to balance performance and resource utilization.\n` +
                 `--------------------------------------------------------------------------------`
             );
         }

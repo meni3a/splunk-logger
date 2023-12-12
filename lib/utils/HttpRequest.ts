@@ -1,13 +1,10 @@
 export class HttpRequest {
-    constructor(url: string, method: string, headers: object, body: any) {
-        this.url = url;
-        this.method = method;
-        this.headers = headers;
-        this.body = body;
+    constructor(request:{ url:string, method:'GET'|'POST'|'PUT'|'DELETE', headers:{}, body:any}) {
+        Object.assign(this, request);
     }
-    url: string;
-    method: string;
-    headers: object;
-    body: any;
+    url!: string;
+    method!: string;
+    headers!: object;
+    body!: string;
 
 }
