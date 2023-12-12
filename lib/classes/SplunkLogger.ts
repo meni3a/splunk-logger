@@ -85,11 +85,16 @@ export class SplunkLogger {
     private handleLog(type: LogLevel, message: any) {
 
         const headers = { Authorization: `Splunk ${this.options.token}` };
-        const body = { type, message };
+        const body = { type, message, timestamp: new Date().toISOString() };
         const request = new HttpRequest(this.url.toString(), "POST", headers, body);
 
         if (this.options.isQueueMode) {
-            this.queue.push(request);
+            if(this.queue.length <= (this.options.maxQueueSize ?? 1000)){
+                this.queue.push(request);
+            }
+            else{
+               console.log("SplunkLogger Fail: Queue is full");
+            }
             this.executeFromQueue();
         }
         else {

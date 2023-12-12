@@ -31,5 +31,6 @@ export class SplunkLoggerOptions {
     shouldPrintLogs?: boolean;
     isQueueMode?: boolean = false;
     numOfParallelRequests?: number = 100;
+    maxQueueSize?: number;
     private isWinstonTransport?: boolean = false;
 }
