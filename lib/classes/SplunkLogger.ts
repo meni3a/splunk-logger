@@ -1,4 +1,4 @@
-import { Colors } from "../enums/Colors";
+import { ConsoleColors } from "../enums/ConsoleColors";
 import { SplunkRequest } from "../utils/SplunkRequest";
 import { LogLevel } from "../enums/LogType";
 import { LogTypeToColor } from "../utils/LogTypeToColor";
@@ -82,7 +82,7 @@ export class SplunkLogger {
 
         if (this.options.shouldPrintLogs) {
             let color = LogTypeToColor[type];
-            const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${type} ${Colors.Regular} - ${JSON.stringify(message)}`;
+            const log = `${new Date().toISOString().substr(11, 8)} - ${color} ${type} ${ConsoleColors.Regular} - ${JSON.stringify(message)}`;
             console.log(log);
         }
     
