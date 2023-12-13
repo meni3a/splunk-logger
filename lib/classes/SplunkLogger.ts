@@ -1,5 +1,5 @@
 import { Colors } from "../enums/Colors";
-import { HttpRequest as SplunkRequest } from "../utils/SplunkRequest";
+import { SplunkRequest } from "../utils/SplunkRequest";
 import { LogLevel } from "../enums/LogType";
 import { LogTypeToColor } from "../utils/LogTypeToColor";
 import { SplunkPayload } from "../types/SplunkPayload";

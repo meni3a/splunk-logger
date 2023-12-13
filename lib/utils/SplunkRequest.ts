@@ -1,5 +1,5 @@
-export class HttpRequest {
-    constructor(request: Partial<HttpRequest>) {
+export class SplunkRequest {
+    constructor(request: Partial<SplunkRequest>) {
         Object.assign(this, request);
     }
     url!: string;
