@@ -12,6 +12,7 @@ export class SplunkLoggerOptions {
     ssl?: boolean = true;
     token!: string;
     shouldPrintLogs?: boolean;
-    private isWinstonTransport?: boolean = false;
     batchOptions?: BatchOptions;
+
+    private isWinstonTransport?: boolean = false;
 }
