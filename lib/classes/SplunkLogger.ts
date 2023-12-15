@@ -49,7 +49,7 @@ export class SplunkLogger{
 
             this.processing = true;
 
-            const requests = this.queue.splice(0, this.options.batchOptions.batchSize ?? 1000);
+            const requests = this.queue.splice(0, this.options.batchOptions?.batchSize ?? 1000);
             
             await this.processRequest(requests);
             
