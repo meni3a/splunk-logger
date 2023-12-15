@@ -3,7 +3,7 @@ export class SplunkRequest {
         Object.assign(this, request);
     }
     url!: string;
-    method!:'GET'|'POST'|'PUT'|'DELETE'
+    method:string = 'POST';
     headers!: object;
     body!: string;
 

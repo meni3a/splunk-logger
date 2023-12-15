@@ -1,4 +1,4 @@
-type QueueModeOptions = {
+type BatchOptions = {
     batchSize: number, 
     queueSizeLimit: number 
 }

@@ -13,4 +13,10 @@ export class SplunkLoggerOptions {
     token!: string;
     shouldPrintLogs?: boolean;
     private isWinstonTransport?: boolean = false;
+
+    batchOptions!: BatchOptions;
+
+    setBatchMode(batchOptions:BatchOptions){
+        this.batchOptions = batchOptions;
+    }
 }

@@ -3,9 +3,6 @@ import { SplunkLogger } from "./SplunkLogger";
 import { SplunkLoggerOptions } from "./SplunkLoggerOptions";
 
 
-const PROCESS_ID = process.pid;
-
-
 export class SplunkWinstonTransport extends Transport {
 	splunk: SplunkLogger;
 
@@ -24,7 +21,7 @@ export class SplunkWinstonTransport extends Transport {
 	async log(info: any, callback: any) {
 		const self = this;
 		let level: string = info[Symbol.for("level")] as string;
-		const msg = { ...info, source: PROCESS_ID };
+		const msg = { ...info };
 		const meta = Object.assign({}, info);
 		delete meta[Symbol.for("level")];
 		delete meta[Symbol.for("message")];
