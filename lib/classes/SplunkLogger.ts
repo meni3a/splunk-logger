@@ -49,7 +49,7 @@ export class SplunkLogger{
 
             this.processing = true;
 
-            const requests = this.queue.splice(0, this.options.batchOptions?.batchSize ?? 1000);
+            const requests = this.queue.splice(0, this.options.batchOptions?.batchSize ?? 200);
             
             await this.processRequest(requests);
             
@@ -84,8 +84,8 @@ export class SplunkLogger{
         }
     
 
-        if (this.options.batchOptions) {
-            if(this.queue.length <= (this.options.batchOptions.queueSizeLimit ?? 1000)){
+        if (this.options.isBatchingEnabled) {
+            if(this.queue.length <= (this.options.batchOptions?.queueSizeLimit ?? 2000)){
                 this.queue.push(splunkPayload);
             }
             else{
