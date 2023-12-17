@@ -90,13 +90,13 @@ QueueMode is particularly useful for applications that generate a large volume o
 
 To enable and configure QueueMode in your application, refer to the following steps:
 
-```javascript
+```js
 // Example configuration for QueueMode in SplunkLogger
-SplunkLogger.setQueueMode({
+{
     batchSize: 50, // Number of log entries per batch
     queueSizeLimit: 1000 // Maximum number of entries in the queue
-});
-
+};
+```
 
 ## Log levels
 
