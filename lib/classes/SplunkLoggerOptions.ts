@@ -9,7 +9,7 @@ export class SplunkLoggerOptions {
     }
     domain!: string;
     port?: number = 8088;
-    ssl?: boolean = true;
+    tls?: boolean = true;
     token!: string;
     shouldPrintLogs?: boolean;
     isBatchingEnabled?: boolean = false;

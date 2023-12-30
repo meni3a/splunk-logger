@@ -52,11 +52,14 @@ const logger = winston.createLogger({
 const options = new SplunkLoggerOptions({
     domain: "localhost",
     port: 8088,
-    ssl: false,
+    tls: false,
     token: "00000000-0000-0000-0000-000000000000",
     shouldPrintLogs: true,
-    isQueueMode: false,
-    numOfParallelRequests: 100
+    isBatchingEnabled: false,
+    batchOptions: {
+        batchSize: 500, 
+        queueSizeLimit: 10000 
+    }
 });
 
 const logger = new SplunkLogger(options)
@@ -69,33 +72,28 @@ In case of error, please check if your Splunk settings and make sure your token 
 
 
 
-## QueueMode Overview
+## BatchMode Overview
 
-### What is QueueMode?
+### What is BatchMode?
 
-QueueMode is an advanced feature in SplunkLogger designed to optimize logging performance in high-traffic environments. This mode enables the batching of multiple log entries, which are then sent to Splunk in a single HTTP request. This method is highly efficient and beneficial for applications where minimizing the impact on the event loop and reducing network traffic is crucial.
+BatchMode is an advanced feature in SplunkLogger designed to optimize logging performance in high-traffic environments. This mode enables the batching of multiple log entries, which are then sent to Splunk in a single HTTP request. This method is highly efficient and beneficial for applications where minimizing the impact on the event loop and reducing network traffic is crucial.
 
 ### Benefits
 
-- **Batched Log Entries:** QueueMode batches a specified number of log entries, which are then sent as a single HTTP request. This significantly reduces the total number of HTTP requests made to Splunk.
-- **Reduced Event Loop Activity:** By lowering the frequency of HTTP requests, QueueMode minimizes the workload on the event loop, leading to improved application performance.
+- **Batched Log Entries:** BatchMode batches a specified number of log entries, which are then sent as a single HTTP request. This significantly reduces the total number of HTTP requests made to Splunk.
+- **Reduced Event Loop Activity:** By lowering the frequency of HTTP requests, BatchMode minimizes the workload on the event loop and network usage, leading to improved application performance.
 - **Customizable Queue Size:** Users have the flexibility to set a limit on the queue size, which helps in managing memory usage effectively and preventing potential memory leaks.
 
 
 ### Recommended Usage
 
-QueueMode is particularly useful for applications that generate a large volume of logs and require efficient log management. It should be configured with a careful balance between performance enhancement and resource utilization. 
+BatchMode is particularly useful for applications that generate a large volume of logs and require efficient log management. It should be configured with a careful balance between performance enhancement and resource utilization. 
 
 ### Configuration
 
-To enable and configure QueueMode in your application, refer to the following steps:
-
+To enable and configure BatchMode in your application set:
 ```js
-// Example configuration for QueueMode in SplunkLogger
-{
-    batchSize: 50, // Number of log entries per batch
-    queueSizeLimit: 1000 // Maximum number of entries in the queue
-};
+    isBatchingEnabled: true
 ```
 
 ## Log levels

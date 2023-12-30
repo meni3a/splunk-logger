@@ -33,7 +33,7 @@ export class SplunkLogger{
     private splunkRequest!: SplunkRequest;
 
     private createSplunkRequest() {
-        const url = `${this.options.ssl ? 'https' : 'http'}://${this.options.domain}:${this.options.port}/services/collector`;
+        const url = `${this.options.tls ? 'https' : 'http'}://${this.options.domain}:${this.options.port}/services/collector`;
         const headers = { Authorization: `Splunk ${this.options.token}` };
 
 
