@@ -60,8 +60,11 @@ export class SplunkLogger{
 
     private async processRequest(data: SplunkPayload[]) {
         try {
-            this.splunkRequest.body = JSON.stringify(data)
-            const response = await this.fetchMethod( this.splunkRequest);
+            const response = await this.fetchMethod(this.splunkRequest.url, {
+                method: this.splunkRequest.method,
+                headers: this.splunkRequest.headers,
+                body: JSON.stringify(data)
+            });
             const result = await response.json();
 
             if (result?.code !== 0) {
