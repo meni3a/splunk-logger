@@ -1,13 +1,13 @@
 {
     "compilerOptions": {
-      "target": "es5",
+      "target": "es2020",
       "module": "commonjs",
-      "lib": [ "es2015" ],
+      "esModuleInterop": true,
       "declaration": true,
-      "outDir": "./",
+      "outDir": "./dist",
       "strict": true,
       "sourceMap":true
     },
-    "include": ["src"],
+    "include": ["lib", "index.ts"],
     "exclude": ["node_modules"]
   }
