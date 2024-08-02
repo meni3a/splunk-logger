@@ -6,4 +6,5 @@ export enum LogLevel {
     DEBUG = "DEBUG",
     INITIAL = "INITIAL",
     HTTP = "HTTP",
+    RAW = "RAW"
 }
