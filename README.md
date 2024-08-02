@@ -103,9 +103,7 @@ To enable and configure BatchMode in your application set:
  - error
  - fatal
  - debug
-
-  
-
+ - raw (for sending raw data directly to Splunk)
 
 ## License
 

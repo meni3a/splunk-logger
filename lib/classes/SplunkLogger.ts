@@ -1,9 +1,9 @@
-import { ConsoleColors } from "../enums/ConsoleColors";
-import { SplunkRequest } from "./SplunkRequest";
-import { LogLevel } from "../enums/LogType";
-import { LogTypeToColor } from "../utils/LogTypeToColor";
-import { SplunkPayload } from "../types/SplunkPayload";
-import { SplunkLoggerOptions } from "./SplunkLoggerOptions";
+import {ConsoleColors} from "../enums/ConsoleColors";
+import {SplunkRequest} from "./SplunkRequest";
+import {LogLevel} from "../enums/LogType";
+import {LogTypeToColor} from "../utils/LogTypeToColor";
+import {SplunkPayload} from "../types/SplunkPayload";
+import {SplunkLoggerOptions} from "./SplunkLoggerOptions";
 
 
 export class SplunkLogger{ 
@@ -78,7 +78,7 @@ export class SplunkLogger{
 
     private handleLog(type: LogLevel, message: any):void {
 
-        const splunkPayload:SplunkPayload = {event:{ type, message }};
+        const splunkPayload:SplunkPayload = type === LogLevel.RAW ? message : {event:{ type, message }};
 
         if (this.options.shouldPrintLogs) {
             let color = LogTypeToColor[type];
@@ -112,5 +112,5 @@ export class SplunkLogger{
     public fatal(message: any) { this.handleLog(LogLevel.FATAL, message); }
 
     public debug(message: any) { this.handleLog(LogLevel.DEBUG, message); }
-
+    public raw(message: any) { this.handleLog(LogLevel.RAW, message); }
 }

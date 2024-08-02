@@ -9,4 +9,5 @@ export const LogTypeToColor : Record<LogLevel,ConsoleColors> = {
     [LogLevel.DEBUG]: ConsoleColors.Cyan,
     [LogLevel.INITIAL]: ConsoleColors.Regular,
     [LogLevel.HTTP]: ConsoleColors.Cyan,
+    [LogLevel.RAW]: ConsoleColors.Regular,
 };
