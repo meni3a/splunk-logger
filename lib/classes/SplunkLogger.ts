@@ -68,15 +68,22 @@ export class SplunkLogger{
             const result = await response.json();
 
             if (result?.code !== 0) {
+                if ( this.options.exceptionOnFailure ) {
+                    throw new Error(`SplunkLogger Error: ${result?.text}`)
+                }
                 console.log("SplunkLogger Error: " + result?.text);
             }
         }
         catch (err) {
+            if ( this.options.exceptionOnFailure ) {
+                err.message = `SplunkLogger Fail: ${err.message}`;
+                throw err;
+            }
             console.log("SplunkLogger Fail: ", err);
         }
     }
 
-    private handleLog(type: LogLevel, message: any):void {
+    private async handleLog(type: LogLevel, message: any):Promise<void> {
 
         const splunkPayload:SplunkPayload = type === LogLevel.RAW ? message : {event:{ type, message }};
 
@@ -92,25 +99,28 @@ export class SplunkLogger{
                 this.queue.push(splunkPayload);
             }
             else{
-               console.log("SplunkLogger Fail: Queue is full");
+                if ( this.options.exceptionOnFailure ) {
+                    throw new Error("SplunkLogger Fail: Queue is full");
+                }
+                console.log("SplunkLogger Fail: Queue is full");
             }
-            this.executeFromQueue();
+            await this.executeFromQueue();
         }
         else {
-            this.processRequest([splunkPayload]);
+            await this.processRequest([splunkPayload]);
         }
 
     }
 
 
-    public error(message: any) { this.handleLog(LogLevel.ERROR, message); }
+    public async error(message: any) { await this.handleLog(LogLevel.ERROR, message); }
 
-    public info(message: any) { this.handleLog(LogLevel.INFO, message); }
+    public async info(message: any) { await this.handleLog(LogLevel.INFO, message); }
 
-    public warn(message: any) { this.handleLog(LogLevel.WARN, message); }
+    public async warn(message: any) { await this.handleLog(LogLevel.WARN, message); }
 
-    public fatal(message: any) { this.handleLog(LogLevel.FATAL, message); }
+    public async fatal(message: any) { await this.handleLog(LogLevel.FATAL, message); }
 
-    public debug(message: any) { this.handleLog(LogLevel.DEBUG, message); }
-    public raw(message: any) { this.handleLog(LogLevel.RAW, message); }
+    public async debug(message: any) { await this.handleLog(LogLevel.DEBUG, message); }
+    public async raw(message: any) { await this.handleLog(LogLevel.RAW, message); }
 }
