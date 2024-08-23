@@ -59,7 +59,8 @@ const options = new SplunkLoggerOptions({
     batchOptions: {
         batchSize: 500, 
         queueSizeLimit: 10000 
-    }
+    },
+    exceptionOnFailure: false
 });
 
 const logger = new SplunkLogger(options)
@@ -94,6 +95,11 @@ BatchMode is particularly useful for applications that generate a large volume o
 To enable and configure BatchMode in your application set:
 ```js
     isBatchingEnabled: true
+```
+
+To enable to receive exceptions when sending data to splunk fails set:
+```js
+    exceptionOnFailure: true
 ```
 
 ## Log levels
