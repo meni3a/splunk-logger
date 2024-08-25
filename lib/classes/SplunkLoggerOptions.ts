@@ -14,6 +14,7 @@ export class SplunkLoggerOptions {
     shouldPrintLogs?: boolean;
     isBatchingEnabled?: boolean = false;
     batchOptions?: BatchOptions;
+    exceptionOnFailure?: boolean = false;
 
     private isWinstonTransport?: boolean = false;
 }
