@@ -74,7 +74,7 @@ export class SplunkLogger{
                 console.log("SplunkLogger Error: " + result?.text);
             }
         }
-        catch (err) {
+        catch (err:any) {
             if ( this.options.exceptionOnFailure ) {
                 err.message = `SplunkLogger Fail: ${err.message}`;
                 throw err;
